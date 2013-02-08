@@ -29,6 +29,7 @@ mymodule/lang/en.yml
 	);
 }
 
+
 $dir = $argv[1];
 if(!is_dir($dir)){
 	die('ERROR: Not a valid directory: '. $dir . NEWLINE);
@@ -39,7 +40,20 @@ if(trim($dir) === '/')
 
 echo 'Performing search on: ' . $dir . NEWLINE;
 $realdir = realpath($dir);
-$dest = isset($argv[2]) ? $argv[2] : $realdir . '/lang/en.yml';
+
+$espex = false;
+//Spanish example mode
+if (isset($argv[2]) && ($argv[2] == 'espex')) {
+	$espex = true;
+	$dest = $realdir . '/lang/es.yml';	
+} else {
+	$dest = isset($argv[2]) ? $argv[2] : $realdir . '/lang/en.yml';	
+}
+
+
+//var_dump($argv);
+//var_dump($dest);
+//die();
 
 $base = dirname($base);
 if(is_dir($base))
@@ -135,12 +149,21 @@ function replaceDir($searchDir)
 replaceDir($realdir);
 
 // now we have a populated $entries array
-$output = 'en:'.NEWLINE;
+if ($espex) {
+	$output = 'es:'.NEWLINE;
+} else {
+	$output = 'en:'.NEWLINE;
+}
+
 foreach($entries as $key => $arr){
 	$output .= '  '.NEWLINE . '# Output for class or file: '. $key . NEWLINE;
 	$output .= '  '.$key.':'.NEWLINE;
 	foreach($arr as $entry => $trnl){
-		$output .= '    '.$entry.': \''.str_replace("'", "\'", $trnl).'\''.NEWLINE;
+		if ($espex) {
+			$output .= '    '.$entry.': \'Texto en Español\''.NEWLINE;
+		} else {
+			$output .= '    '.$entry.': \''.str_replace("'", "\'", $trnl).'\''.NEWLINE;
+		}
 	}
 }
 
@@ -153,5 +176,3 @@ if(fwrite($handle, $output) === false){
 }
 echo '---------------------------------------------------' . NEWLINE;
 fclose($handle);
-
-?>
